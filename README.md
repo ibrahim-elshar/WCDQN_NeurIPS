@@ -1,7 +1,3 @@
-# WCDQN
-
-To rerun the experiments for an evironment cd to the environment folder first then run job.slurm file on a cluster. To plot the results run the plot_results.py file.
-
 # Weakly Coupoled Deep Q-Networks
 **Authors:** Ibrahim El Shar and Daniel Jiang 
 
@@ -41,19 +37,8 @@ Clone this repo:
 ## Instructions
 There are three environments organized in folders inside `src`: EV charging, multi-product inventory control, and Online stochastic ad matching. Each environment is  placed in a separate folder.
 
-Each folder contains:
-- Environment file, e.g. `carsharing.py` for `2-CS`. Running this file will produce the optimal Q-value `Qstar.pkl` if applicable.
-- `agents.py` file that contains the code for `QL, Double-QL, SQL, BCQL` and `LBQL` algorithms. 
-- `run.py` file which re-runs the experiments for the environment and reproduce the performance and relative error plots.
+To rerun the experiments for an evironment cd to the environment folder first then run `job.slurm` file on a cluster. To plot the results run the `plot_results.py` file.
 
-Hyperparameters for an algorithm can be set by chaninging the corresponding class default parameters in `agents.py` file.
-
-`python agents.py` will produce `LBQL` vs `QL` bounds plots.
-
-To rerun the experiments for an evironment cd to the environment folder first then:
-~~~
-$ python run.py
-~~~
 
 
 
