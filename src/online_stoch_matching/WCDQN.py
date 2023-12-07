@@ -98,14 +98,14 @@ class Network(tf.keras.Model):
 
         self.test_model = tf.keras.models.Model(inputs=input_state_layer, outputs=q_pred, name='test_only')
 
-        print('#'*50)
-        print('Main Model Summary')
-        print('#' * 50)
-        print(self.model.summary())
-        print('#'*50)
-        print('Main Test Model Summary')
-        print('#' * 50)
-        print(self.test_model.summary())
+        # print('#'*50)
+        # print('Main Model Summary')
+        # print('#' * 50)
+        # print(self.model.summary())
+        # print('#'*50)
+        # print('Main Test Model Summary')
+        # print('#' * 50)
+        # print(self.test_model.summary())
 
     def bounded_loss_function(self, q_pred, q_target, u_layer):
         mse_loss = tf.keras.losses.mse(q_target, q_pred)

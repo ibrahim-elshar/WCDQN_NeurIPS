@@ -23,7 +23,7 @@ config = {'make_to_stock' : {'num_experiments': 5,
                             'holding_cost':  np.array([0.1, 0.2, 0.05, 0.3, 0.2, 0.5, 0.3, 0.4, 0.15, 0.12]),
                             'backorder_cost': np.array([3., 1.2, 5.15, 1.3, 1.1, 1.1, 10.3, 1.05, 1., 3.1]), 
                             'lostsales_cost': np.array([30.1, 3.3, 10.05, 3.9, 3.7, 3.6, 40.3, 4.5, 12.55, 44.1]),
-                             'production_rate_coefficients': np.array([12., 5.971]),
+                            'production_rate_coefficients': np.array([12., 5.971]),
                             ###
                             'state_dim' : num_products+1,
                             'subproblem_state_dim' : 2,

@@ -32,8 +32,7 @@ class BaseAgent(DQN):
                  memory_size=10000, batch_size=32, update_subproblem_target_model_freq=32 * 1 * 10, hidden_layers=None,
                  lambda_max=10, num_lambda=100):
         super().__init__(env, save_path, model_name, experiment_num, learning_rate, gamma, epsilon, epsilon_min,
-                 epsilon_decay, burn_in,
-                 memory_size, batch_size, update_subproblem_target_model_freq, hidden_layers)
+                 epsilon_decay, burn_in, memory_size, batch_size, update_subproblem_target_model_freq, hidden_layers)
         if hidden_layers is None:
             hidden_layers = [64, 32, 32]
         self.update_subproblem_target_model_freq = update_subproblem_target_model_freq

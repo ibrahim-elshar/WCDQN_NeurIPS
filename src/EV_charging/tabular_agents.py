@@ -53,7 +53,7 @@ class Qlearning():
                        SEED,
                        GAMMA=0.9, 
                        eps_greedy_par=0.4,
-                       NUM_EPISODES=6000,
+                       NUM_EPISODES=1000,
                        ):
         self.env = ENV
         self.env.seed(SEED)
@@ -423,7 +423,7 @@ class Bias_corrected_QL(Qlearning):
             while not done and step<=300:
                 # choose an action based on epsilon-greedy policy
                 self.Q[state_idx, :] += (1-self.env.action_mask)* -100000000.
-                q_values = self.Q[state_idx, :] #+ self.U[state, :] - self.L[state,:]           
+                q_values = self.Q[state_idx, :]            
                 action, action_idx = self.epsilon_greedy_policy(q_values, state_idx,self.env.action_mask)
                 
                 
@@ -573,7 +573,6 @@ class WCQL(Qlearning):
         self.B_lr_func = polynomial_learning_rate
         self.count_B = np.zeros(self.env.nCost)
         self.count_subprob = np.zeros([self.env.numArms,self.env.subproblem_nS, 2]) 
-        self.lr_func_sub = polynomial_learning_rate
 
         if not self.env.fixedProcessCost:
             self.B = np.zeros(self.env.nCost)
@@ -585,7 +584,6 @@ class WCQL(Qlearning):
         for i in range(self.env.numArms):
             self.Q_lam[i] =  QQ
             
-        self.L =  np.ones((self.env.nS, self.env.nA))*self.env.Rmin/(1-self.gamma)
         self.U =  np.ones((self.env.nS, self.env.nA))*self.env.Rmax/(1-self.gamma)                 
 
         self.B_list  = []
@@ -620,7 +618,6 @@ class WCQL(Qlearning):
         rewards = []
         self.avg_rewards = []
                   
-        self.Lplot = []
         self.Uplot = []
         self.Q_array = []
         for episode in range(self.num_episodes):
@@ -645,14 +642,12 @@ class WCQL(Qlearning):
                 self.Q[state_idx, :] += (1-self.env.action_mask)* -100000000.
                 q_values = self.Q[state_idx, :]   
                 ##########################
-
                 if cond and self.lagrangian_policy:#  
                     upper_bound_value = self.lagrangian_action( w_idx, sub_states_idx)
                             
                     action, action_idx = self.epsilon_greedy_policy(upper_bound_value, state_idx,self.env.action_mask)
                 else:
                 ##########################     
-                    # print(state,q_values)                         
                     action, action_idx = self.epsilon_greedy_policy(q_values, state_idx,self.env.action_mask)
                 self.count[state_idx, action_idx] += 1  
                 w = state[0]
@@ -678,28 +673,13 @@ class WCQL(Qlearning):
                     self.Q_lam, self.count_subprob, self.lam_lr = updateQLag(exp, self.env.numArms, self.count_subprob,self.lambdaSet,self.Q_lam,self.gamma)
                     self.updateB(w, w_idx, wNext_idx)
 
-                    consider_lower_bound = True
-                    if consider_lower_bound:
-                        upper_bound_value = self.lagrangian_action(wNext_idx, sub_nextStates_idx)
-                        lagrangian_action_idx = np.argmax(upper_bound_value)
-                        # Lagrangian action-value lower bound update
-                        self.L[state_idx, action_idx] += self.lr * (
-                                reward + self.gamma * self.L[newState_idx, lagrangian_action_idx] \
-                                - self.L[state_idx, action_idx])
-                        self.Q[state_idx, action_idx] = np.maximum(np.minimum(np.inf, 
-                                                                         self.Q[state_idx, action_idx]),  self.L[state_idx, action_idx])
+                    feasible_actions_idx = np.arange(self.env.nA)[np.ma.make_mask(self.env.action_mask)]
+                    
+                    for a_idx in feasible_actions_idx:
+                            act = self.env.actions[a_idx]
+                            u, lam = compute_ub(w_idx, np.array(sub_states_idx), act,self.num_lambda,self.Q_lam, self.B,self.lambdaSet,self.env.numArms)
 
-    
-                    if cond:
-                        
-                        feasible_actions_idx = np.arange(self.env.nA)[np.ma.make_mask(self.env.action_mask)]
-                       
-                        for a_idx in feasible_actions_idx:
-                                act = self.env.actions[a_idx]
-                                u, lam = compute_ub(w_idx, np.array(sub_states_idx), act,self.num_lambda,self.Q_lam, self.B,self.lambdaSet,self.env.numArms)
-
-                                self.Q[state_idx, a_idx] = np.maximum(np.minimum(u,
-                                                      self.Q[state_idx, a_idx]),-np.inf)
+                            self.Q[state_idx, a_idx] = np.minimum(u,self.Q[state_idx, a_idx])
                      
                 state = newState
                 state_idx = newState_idx
@@ -769,8 +749,6 @@ class WCQL(Qlearning):
                 sub_states_idx = self.find_indices_subproblem(sub_curStates)
                 w = state[0]
                 w_idx = self.env.costToIndex[w]
-
-
                 returns += discount * reward
                 discount = discount * gamma
                 t += 1
@@ -812,6 +790,4 @@ class LagQlearning_lag_policy(WCQL):
     '''
     def __init__(self, ENV, SEED,):
         super(LagQlearning_lag_policy, self).__init__(ENV, SEED,lagrangian_policy=True)
-    
-
     

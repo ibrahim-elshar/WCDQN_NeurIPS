@@ -69,7 +69,6 @@ if __name__ == '__main__':
 
     save_path = "maketostock_weights/"
 
-    # agent = DQN(env, save_path=save_path)
 
 
 
